@@ -3,11 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 /flask_session
-<<<<<<< HEAD
 *.ini
-=======
-database.ini
->>>>>>> c241578 (Added inital setup)
 # C extensions
 *.so
 

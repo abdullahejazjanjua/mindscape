@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% macro render_comments(comments) %}
+{% macro render_comments(comments, level=0) %}
   <ul class="list-group">
     {% for item in comments %}
       <li class="list-group-item border rounded my-2 p-3">
@@ -24,8 +24,9 @@
         </div>
 
         {% if item.replies %}
-          <div class="ms-4">
-            {{ render_comments(item.replies) }}
+          <!-- Indent replies by increasing level -->
+          <div class="ms-4" style="margin-left: {{ level * 20 }}px;">
+            {{ render_comments(item.replies, level + 1) }}
           </div>
         {% endif %}
       </li>

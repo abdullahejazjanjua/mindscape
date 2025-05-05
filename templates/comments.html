@@ -1,31 +1,28 @@
 {% extends "layout.html" %}
 
 {% macro render_comments(comments, level=0) %}
-  <ul class="list-group">
+  <ul class="comment-list">
     {% for item in comments %}
-      <li class="list-group-item border rounded my-2 p-3">
-        <strong>{{ item.comment.Username }}</strong><br>
-        <small class="text-muted">{{ item.comment.Date.strftime('%B %d, %Y %H:%M') if item.comment.Date else '' }}</small>
-        <p class="mt-2">{{ item.comment.Text }}</p>
+      <li class="comment-item">
+        <div class="comment-header">
+          <strong class="username">{{ item.comment.Username }}</strong>
+          <small class="comment-date">{{ item.comment.Date.strftime('%B %d, %Y %H:%M') if item.comment.Date else '' }}</small>
+        </div>
 
-        <!-- Reply button -->
-        <button class="btn btn-secondary btn-sm" onclick="showReplyForm({{ item.comment.CommentID }})">Reply</button>
+        <p class="comment-text">{{ item.comment.Text }}</p>
 
-        <!-- Reply form (hidden initially) -->
-        <div id="reply-form-{{ item.comment.CommentID }}" style="display:none; margin-top: 10px;">
-          <form method="post" action="">
+        <button class="reply-btn" onclick="showReplyForm({{ item.comment.CommentID }})">Reply</button>
+
+        <div id="reply-form-{{ item.comment.CommentID }}" class="reply-form">
+          <form method="post" action="{{ url_for('board_comments', board_id=board_id) }}">
             <input type="hidden" name="parent_comment_id" value="{{ item.comment.CommentID }}">
-            <div class="mb-3">
-              <label for="comment_text_{{ item.comment.CommentID }}" class="form-label">Your Reply</label>
-              <textarea class="form-control" id="comment_text_{{ item.comment.CommentID }}" name="comment_text" rows="4" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Post Reply</button>
+            <textarea class="form-control comment-input" name="comment_text" rows="4" placeholder="Write a reply..." required></textarea>
+            <button type="submit" class="btn btn-primary btn-sm mt-2">Post Reply</button>
           </form>
         </div>
 
         {% if item.replies %}
-          <!-- Indent replies by increasing level -->
-          <div class="ms-4" style="margin-left: {{ level * 20 }}px;">
+          <div class="nested-comments {% if level > 0 %}nested-border{% endif %}">
             {{ render_comments(item.replies, level + 1) }}
           </div>
         {% endif %}
@@ -34,34 +31,136 @@
   </ul>
 {% endmacro %}
 
-{% block title %}Comments{% endblock %}
+{% block title %}
+  Comments{% if board_theme %} for {{ board_theme }}{% endif %}
+{% endblock %}
 
 {% block main %}
-<div class="container my-4">
-  <h2 class="mb-4">Comments</h2>
+  <style>
+    .container {
+      max-width: 800px;
+    }
 
-  {% if comments %}
-    {{ render_comments(comments) }}
-  {% else %}
-    <p class="text-muted">No comments yet.</p>
-  {% endif %}
+    h2, h3 {
+      font-weight: 600;
+      color: #2c3e50;
+    }
 
-  <!-- Add Comment Form -->
-  <h3 class="mt-5 mb-3">Post a Comment</h3>
-  <form method="post" action="">
-    <div class="mb-3">
-      <label for="comment_text" class="form-label">Your Comment</label>
-      <textarea class="form-control" id="comment_text" name="comment_text" rows="4" required></textarea>
-    </div>
-    <button type="submit" class="btn btn-primary">Post Comment</button>
-  </form>
-</div>
+    .comment-list {
+      list-style: none;
+      padding-left: 0;
+    }
 
-<script>
-  // JavaScript to toggle the reply form visibility
-  function showReplyForm(commentId) {
-    var replyForm = document.getElementById("reply-form-" + commentId);
-    replyForm.style.display = (replyForm.style.display === "none" || replyForm.style.display === "") ? "block" : "none";
-  }
-</script>
+    .comment-item {
+      background: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .comment-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .username {
+      color: #34495e;
+      font-size: 1.1rem;
+    }
+
+    .comment-date {
+      color: #95a5a6;
+      font-size: 0.9rem;
+    }
+
+    .comment-text {
+      font-size: 1.1rem;
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    .reply-btn {
+      background: none;
+      border: none;
+      color: #3498db;
+      font-size: 0.95rem;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .reply-btn:hover {
+      text-decoration: underline;
+    }
+
+    .reply-form {
+      display: none;
+      margin-top: 10px;
+    }
+
+    .comment-input {
+      font-size: 1rem;
+      resize: none;
+    }
+
+    .nested-comments {
+      margin-left: 20px;
+      margin-top: 15px;
+    }
+
+    .nested-border {
+      border-left: 3px solid #e1e4e8;
+      padding-left: 15px;
+    }
+
+    .alert {
+      font-size: 0.95rem;
+    }
+
+    .btn-lg {
+      font-size: 1.1rem;
+      padding: 12px;
+    }
+  </style>
+
+  <div class="container my-5">
+    <h2 class="mb-4 text-center">Comments{% if board_theme %} for "{{ board_theme }}"{% endif %}</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flashes mb-4">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% if comments %}
+      {{ render_comments(comments) }}
+    {% else %}
+      <p class="text-muted text-center">No comments yet.</p>
+    {% endif %}
+
+    <h3 class="mt-5 mb-3 text-center">Post a Comment</h3>
+    <form method="post" action="{{ url_for('board_comments', board_id=board_id) }}">
+      <div class="mb-3">
+        <textarea class="form-control comment-input" name="comment_text" rows="5" placeholder="Write a comment..." required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg w-100">Post Comment</button>
+    </form>
+  </div>
+
+  <script>
+    function showReplyForm(commentId) {
+      var form = document.getElementById("reply-form-" + commentId);
+      form.style.display = (form.style.display === "none" || form.style.display === "") ? "block" : "none";
+    }
+  </script>
 {% endblock %}

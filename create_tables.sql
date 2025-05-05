@@ -32,7 +32,6 @@ CREATE TABLE MOD_BOARD (
     FOREIGN KEY (BoardID) REFERENCES BOARD(BoardID)
 );
 
--- 5. COMMENTS TABLE (weak entity, with recursive FK)
 CREATE TABLE COMMENTS (
     CommentID INT,
     BoardID INT,
@@ -46,7 +45,6 @@ CREATE TABLE COMMENTS (
     FOREIGN KEY (ParentCommentID, BoardID) REFERENCES COMMENTS(CommentID, BoardID)
 );
 
--- 6. REPORTS TABLE (weak entity)
 CREATE TABLE REPORTS (
     ReportID INT,
     UserID INT,
@@ -62,4 +60,33 @@ INSERT INTO USERS (Name, Username, Email, Password) VALUES
 
 SELECT username, email, password FROM USERS WHERE username = 'alice123';
 
+SELECT * FROM Board;
 
+INSERT INTO USERS (Name, Username, Email, Password) VALUES
+('Bob', 'bob321', 'bob@example.com', 'pass2'),
+('Carol', 'carol456', 'carol@example.com', 'pass3');
+
+-- INSERT INTO USER_MOD (UserID, ModID) VALUES
+-- (1, 101),
+-- (2, 102);
+
+-- Insert BOARDs
+INSERT INTO BOARD (Theme, Date_Created) VALUES
+('Technology', '2024-01-01'),
+('Gaming', '2024-02-15');
+
+-- Insert MOD_BOARD (Alice moderates Tech, Bob moderates Gaming)
+INSERT INTO MOD_BOARD (UserID, ModID, BoardID) VALUES
+(1, 101, 1),
+(2, 102, 2);
+
+-- Insert COMMENTS
+INSERT INTO COMMENTS (CommentID, BoardID, Text, Date, UserID, ParentCommentID) VALUES
+(1, 1, 'Welcome to Tech board!', '2025-01-01 10:00:00', 1, NULL),
+(2, 1, 'Thanks! Glad to be here.', '2025-01-01 10:05:00', 2, 1),
+(3, 2, 'Anyone playing Elden Ring?', '2025-01-10 15:30:00', 2, NULL);
+
+-- Insert REPORTS
+INSERT INTO REPORTS (ReportID, UserID, Text, IO) VALUES
+(1, 1, 'Spam in comments', TRUE),
+(2, 2, 'Offensive language', FALSE);

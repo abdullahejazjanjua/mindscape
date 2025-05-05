@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+
+{% macro render_comments(comments) %}
+  <ul class="list-group">
+    {% for item in comments %}
+      <li class="list-group-item border rounded my-2 p-3">
+        <strong>{{ item.comment.Username }}</strong><br>
+        <small class="text-muted">{{ item.comment.Date.strftime('%B %d, %Y %H:%M') if item.comment.Date else '' }}</small>
+        <p class="mt-2">{{ item.comment.Text }}</p>
+
+        <!-- Reply button -->
+        <button class="btn btn-secondary btn-sm" onclick="showReplyForm({{ item.comment.CommentID }})">Reply</button>
+
+        <!-- Reply form (hidden initially) -->
+        <div id="reply-form-{{ item.comment.CommentID }}" style="display:none; margin-top: 10px;">
+          <form method="post" action="">
+            <input type="hidden" name="parent_comment_id" value="{{ item.comment.CommentID }}">
+            <div class="mb-3">
+              <label for="comment_text_{{ item.comment.CommentID }}" class="form-label">Your Reply</label>
+              <textarea class="form-control" id="comment_text_{{ item.comment.CommentID }}" name="comment_text" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Post Reply</button>
+          </form>
+        </div>
+
+        {% if item.replies %}
+          <div class="ms-4">
+            {{ render_comments(item.replies) }}
+          </div>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endmacro %}
+
+{% block title %}Comments{% endblock %}
+
+{% block main %}
+<div class="container my-4">
+  <h2 class="mb-4">Comments</h2>
+
+  {% if comments %}
+    {{ render_comments(comments) }}
+  {% else %}
+    <p class="text-muted">No comments yet.</p>
+  {% endif %}
+
+  <!-- Add Comment Form -->
+  <h3 class="mt-5 mb-3">Post a Comment</h3>
+  <form method="post" action="">
+    <div class="mb-3">
+      <label for="comment_text" class="form-label">Your Comment</label>
+      <textarea class="form-control" id="comment_text" name="comment_text" rows="4" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Post Comment</button>
+  </form>
+</div>
+
+<script>
+  // JavaScript to toggle the reply form visibility
+  function showReplyForm(commentId) {
+    var replyForm = document.getElementById("reply-form-" + commentId);
+    replyForm.style.display = (replyForm.style.display === "none" || replyForm.style.display === "") ? "block" : "none";
+  }
+</script>
+{% endblock %}

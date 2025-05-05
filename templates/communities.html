@@ -5,126 +5,34 @@
 {% endblock %}
 
 {% block main %}
-<div class="bg-light min-vh-100"> <div class="container-fluid px-lg-4">
+<div class="tab-pane fade show active" id="my-moodboards" role="tabpanel" aria-labelledby="my-moodboards-tab">
+  <div class="row g-4 mb-5">
 
-    <div class="bg-primary text-white p-5 rounded-3 my-4 shadow-lg text-center position-relative">
-      <h1 class="display-4 fw-bold mb-3">Available MoodBoards</h1>
-      <p class="lead mx-auto" style="max-width: 40em;">
-        Join local GIKI's MoodBoards to connect with students across campus, share thoughts, ideas and discuss life!
-      </p>
-    </div>
-
-    <div class="d-flex justify-content-end my-4">
-      <button class="btn btn-primary shadow-sm d-inline-flex align-items-center" data-bs-toggle="modal" data-bs-target="#createMoodboardModal">
-        <i class="bi bi-plus-lg me-2"></i> Create MoodBoard
-      </button>
-    </div>
-
-    <ul class="nav nav-pills nav-fill mb-4" id="moodboardTabs" role="tablist">
-      <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="my-moodboards-tab" data-bs-toggle="pill" data-bs-target="#my-moodboards" type="button" role="tab" aria-controls="my-moodboards" aria-selected="true">
-          My MoodBoards (3)
-        </button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="discover-tab" data-bs-toggle="pill" data-bs-target="#discover" type="button" role="tab" aria-controls="discover" aria-selected="false">
-          Discover (0)
-        </button>
-      </li>
-    </ul>
-
-    <div class="tab-content" id="moodboardTabsContent">
-      <div class="tab-pane fade show active" id="my-moodboards" role="tabpanel" aria-labelledby="my-moodboards-tab">
-
-        <div class="row g-4 mb-5">
-
-          <div class="col-md-6 col-lg-4">
-            <div class="card shadow-sm h-100"> <img src="images/3.jpg" class="card-img-top" alt="Mindful Movers" style="height: 200px; object-fit: cover;"> <div class="card-body d-flex flex-column"> <h5 class="card-title fw-semibold">Mindful Movers</h5>
-                <div class="d-flex align-items-center text-muted small mb-2">
-                  <i class="bi bi-geo-alt-fill me-1"></i> Wellness Grounds
-                </div>
-                <p class="card-text text-secondary small flex-grow-1"> Combine movement and mindfulness with group activities like mindful walking, yoga, and grounding exercises to stay active and centered.
-                </p>
-                <div class="d-flex gap-2 mt-3">
-                  <a href="#" class="btn btn-sm btn-outline-primary">View</a>
-                  <button class="btn btn-sm btn-outline-danger">Leave</button>
-                </div>
-              </div>
-            </div>
+    {% for board in boards %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card shadow-sm h-100">
+        <img src="{{ url_for('static', filename='images/default.jpg') }}" class="card-img-top" alt="{{ board['Theme'] }}" style="height: 200px; object-fit: cover;">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title fw-semibold">{{ board['Theme'] }}</h5>
+          <div class="d-flex align-items-center text-muted small mb-2">
+            <i class="bi bi-calendar3 me-1"></i>
+            Created on {{ board['Date_Created'].strftime('%B %d, %Y') }}
           </div>
-
-          <div class="col-md-6 col-lg-4">
-            <div class="card shadow-sm h-100">
-              <img src="images/1.jpg" class="card-img-top" alt="Islamabad Soul Space" style="height: 200px; object-fit: cover;">
-              <div class="card-body d-flex flex-column">
-                <h5 class="card-title fw-semibold">Islamabad Soul Space</h5>
-                <div class="d-flex align-items-center text-muted small mb-2">
-                  <i class="bi bi-geo-alt-fill me-1"></i>
-                  Islamabad Capital Territory
-                </div>
-                <p class="card-text text-secondary small flex-grow-1">
-                  A sanctuary for Islamabad residents to discuss mental health, share wellness resources, and organize local support gatherings.
-                </p>
-                <div class="d-flex gap-2 mt-3">
-                  <a href="#" class="btn btn-sm btn-outline-primary">View</a>
-                  <button class="btn btn-sm btn-outline-danger">Leave</button>
-                </div>
-              </div>
-            </div>
+          <p class="card-text text-secondary small flex-grow-1">No description available.</p>
+          <div class="d-flex gap-2 mt-3">
+            <a href="/board/{{ board['BoardID'] }}" class="btn btn-sm btn-outline-primary">View</a>
+            <button class="btn btn-sm btn-outline-danger">Leave</button>
           </div>
-
-          <div class="col-md-6 col-lg-4">
-            <div class="card shadow-sm h-100">
-              <img src="images/2.jpg" class="card-img-top" alt="MindScape@GIKI" style="height: 200px; object-fit: cover;">
-              <div class="card-body d-flex flex-column">
-                <h5 class="card-title fw-semibold">MindScape@GIKI</h5>
-                <div class="d-flex align-items-center text-muted small mb-2">
-                  <i class="bi bi-geo-alt-fill me-1"></i>
-                  GIK Institute, Topi
-                </div>
-                <p class="card-text text-secondary small flex-grow-1">
-                  A safe space for GIKIans to talk about student life challenges, support each other, and explore mental well-being together.
-                </p>
-                <div class="d-flex gap-2 mt-3">
-                  <a href="#" class="btn btn-sm btn-outline-primary">View</a>
-                  <button class="btn btn-sm btn-outline-danger">Leave</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          </div></div><div class="tab-pane fade" id="discover" role="tabpanel" aria-labelledby="discover-tab">
-        <p class="text-center text-muted mt-5">No MoodBoards to discover yet.</p>
-      </div></div> </div> <div class="modal fade" id="createMoodboardModal" tabindex="-1" aria-labelledby="createMoodboardModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered"> <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="createMoodboardModalLabel">Create a MoodBoard</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
-          <form action="/create-moodboard" method="POST" enctype="multipart/form-data"> <div class="mb-3">
-              <label for="moodboard-name" class="form-label">Name</label>
-              <input type="text" class="form-control" id="moodboard-name" name="name" placeholder="e.g., GIKI Creatives Hub" required>
-            </div>
-            <div class="mb-3">
-              <label for="moodboard-location" class="form-label">Location</label>
-              <input type="text" class="form-control" id="moodboard-location" name="location" placeholder="e.g., GIK Institute or Online">
-            </div>
-            <div class="mb-3">
-              <label for="moodboard-description" class="form-label">Description</label>
-              <textarea class="form-control" id="moodboard-description" name="description" rows="3" placeholder="Describe the purpose of this MoodBoard..." required></textarea>
-            </div>
-            <div class="mb-3">
-              <label for="moodboard-image" class="form-label">Cover Image (Optional)</label>
-              <input class="form-control" type="file" id="moodboard-image" name="image" accept="image/*">
-            </div>
-            <div class="modal-footer pb-0"> <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-              <button type="submit" class="btn btn-primary">Create MoodBoard</button>
-            </div>
-          </form>
-        </div>
-        </div>
+      </div>
     </div>
+    {% endfor %}
+
+    {% if boards|length == 0 %}
+    <p class="text-center text-muted mt-5">You haven't joined any MoodBoards yet.</p>
+    {% endif %}
+
   </div>
+</div>
 
-</div>{% endblock %}
+{% endblock %}

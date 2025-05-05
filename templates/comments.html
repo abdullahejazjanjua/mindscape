@@ -17,7 +17,7 @@
           <form method="post" action="{{ url_for('board_comments', board_id=board_id) }}">
             <input type="hidden" name="parent_comment_id" value="{{ item.comment.CommentID }}">
             <textarea class="form-control comment-input" name="comment_text" rows="4" placeholder="Write a reply..." required></textarea>
-            <button type="submit" class="btn btn-primary btn-sm mt-2">Post Reply</button>
+            <button type="submit" class="btn btn-reply mt-2">Post Reply</button>
           </form>
         </div>
 
@@ -37,13 +37,18 @@
 
 {% block main %}
   <style>
+    body {
+      background-color: #f4f9fd;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
     .container {
       max-width: 800px;
     }
 
     h2, h3 {
-      font-weight: 600;
-      color: #2c3e50;
+      font-weight: 700;
+      color: #1d3557;
     }
 
     .comment-list {
@@ -53,11 +58,12 @@
 
     .comment-item {
       background: #ffffff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
+      border: 1px solid #dee2e6;
+      border-left: 5px solid #74c0fc;
+      border-radius: 10px;
       padding: 20px;
       margin-bottom: 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
     }
 
     .comment-header {
@@ -68,31 +74,33 @@
     }
 
     .username {
-      color: #34495e;
+      color: #0077b6;
       font-size: 1.1rem;
     }
 
     .comment-date {
-      color: #95a5a6;
+      color: #adb5bd;
       font-size: 0.9rem;
     }
 
     .comment-text {
       font-size: 1.1rem;
-      color: #555;
-      margin-bottom: 10px;
+      color: #333;
+      margin-bottom: 12px;
     }
 
     .reply-btn {
       background: none;
       border: none;
-      color: #3498db;
+      color: #1d84b5;
       font-size: 0.95rem;
+      font-weight: 500;
       cursor: pointer;
       padding: 0;
     }
 
     .reply-btn:hover {
+      color: #1971c2;
       text-decoration: underline;
     }
 
@@ -104,6 +112,21 @@
     .comment-input {
       font-size: 1rem;
       resize: none;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+    }
+
+    .btn-reply {
+      background-color: #4dabf7;
+      border: none;
+      color: white;
+      font-size: 0.9rem;
+      padding: 6px 12px;
+      border-radius: 4px;
+    }
+
+    .btn-reply:hover {
+      background-color: #339af0;
     }
 
     .nested-comments {
@@ -112,7 +135,7 @@
     }
 
     .nested-border {
-      border-left: 3px solid #e1e4e8;
+      border-left: 3px dashed #a5d8ff;
       padding-left: 15px;
     }
 
@@ -124,6 +147,22 @@
       font-size: 1.1rem;
       padding: 12px;
     }
+
+    .form-control.comment-input:focus {
+      border-color: #74c0fc;
+      box-shadow: 0 0 0 0.2rem rgba(116, 192, 252, 0.25);
+    }
+
+    .w-100 {
+      background-color: #228be6;
+      border-color: #228be6;
+    }
+
+    .w-100:hover {
+      background-color: #1c7ed6;
+      border-color: #1c7ed6;
+    }
+
   </style>
 
   <div class="container my-5">
@@ -159,7 +198,7 @@
 
   <script>
     function showReplyForm(commentId) {
-      var form = document.getElementById("reply-form-" + commentId);
+      const form = document.getElementById("reply-form-" + commentId);
       form.style.display = (form.style.display === "none" || form.style.display === "") ? "block" : "none";
     }
   </script>

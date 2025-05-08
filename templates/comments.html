@@ -1,205 +1,589 @@
-{% extends "layout.html" %}
-
-{% macro render_comments(comments, level=0) %}
-  <ul class="comment-list">
-    {% for item in comments %}
-      <li class="comment-item">
-        <div class="comment-header">
-          <strong class="username">{{ item.comment.Username }}</strong>
-          <small class="comment-date">{{ item.comment.Date.strftime('%B %d, %Y %H:%M') if item.comment.Date else '' }}</small>
-        </div>
-
-        <p class="comment-text">{{ item.comment.Text }}</p>
-
-        <button class="reply-btn" onclick="showReplyForm({{ item.comment.CommentID }})">Reply</button>
-
-        <div id="reply-form-{{ item.comment.CommentID }}" class="reply-form">
-          <form method="post" action="{{ url_for('board_comments', board_id=board_id) }}">
-            <input type="hidden" name="parent_comment_id" value="{{ item.comment.CommentID }}">
-            <textarea class="form-control comment-input" name="comment_text" rows="4" placeholder="Write a reply..." required></textarea>
-            <button type="submit" class="btn btn-reply mt-2">Post Reply</button>
-          </form>
-        </div>
-
-        {% if item.replies %}
-          <div class="nested-comments {% if level > 0 %}nested-border{% endif %}">
-            {{ render_comments(item.replies, level + 1) }}
-          </div>
-        {% endif %}
-      </li>
-    {% endfor %}
-  </ul>
-{% endmacro %}
-
-{% block title %}
-  Comments{% if board_theme %} for {{ board_theme }}{% endif %}
-{% endblock %}
-
-{% block main %}
-  <style>
-    body {
-      background-color: #f4f9fd;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    .container {
-      max-width: 800px;
-    }
-
-    h2, h3 {
-      font-weight: 700;
-      color: #1d3557;
-    }
-
-    .comment-list {
-      list-style: none;
-      padding-left: 0;
-    }
-
-    .comment-item {
-      background: #ffffff;
-      border: 1px solid #dee2e6;
-      border-left: 5px solid #74c0fc;
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
-    }
-
-    .comment-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .username {
-      color: #0077b6;
-      font-size: 1.1rem;
-    }
-
-    .comment-date {
-      color: #adb5bd;
-      font-size: 0.9rem;
-    }
-
-    .comment-text {
-      font-size: 1.1rem;
-      color: #333;
-      margin-bottom: 12px;
-    }
-
-    .reply-btn {
-      background: none;
-      border: none;
-      color: #1d84b5;
-      font-size: 0.95rem;
-      font-weight: 500;
-      cursor: pointer;
-      padding: 0;
-    }
-
-    .reply-btn:hover {
-      color: #1971c2;
-      text-decoration: underline;
-    }
-
-    .reply-form {
-      display: none;
-      margin-top: 10px;
-    }
-
-    .comment-input {
-      font-size: 1rem;
-      resize: none;
-      border: 1px solid #ced4da;
-      border-radius: 6px;
-    }
-
-    .btn-reply {
-      background-color: #4dabf7;
-      border: none;
-      color: white;
-      font-size: 0.9rem;
-      padding: 6px 12px;
-      border-radius: 4px;
-    }
-
-    .btn-reply:hover {
-      background-color: #339af0;
-    }
-
-    .nested-comments {
-      margin-left: 20px;
-      margin-top: 15px;
-    }
-
-    .nested-border {
-      border-left: 3px dashed #a5d8ff;
-      padding-left: 15px;
-    }
-
-    .alert {
-      font-size: 0.95rem;
-    }
-
-    .btn-lg {
-      font-size: 1.1rem;
-      padding: 12px;
-    }
-
-    .form-control.comment-input:focus {
-      border-color: #74c0fc;
-      box-shadow: 0 0 0 0.2rem rgba(116, 192, 252, 0.25);
-    }
-
-    .w-100 {
-      background-color: #228be6;
-      border-color: #228be6;
-    }
-
-    .w-100:hover {
-      background-color: #1c7ed6;
-      border-color: #1c7ed6;
-    }
-
-  </style>
-
-  <div class="container my-5">
-    <h2 class="mb-4 text-center">Comments{% if board_theme %} for "{{ board_theme }}"{% endif %}</h2>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div class="flashes mb-4">
-          {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-              {{ message }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-          {% endfor %}
-        </div>
-      {% endif %}
-    {% endwith %}
-
-    {% if comments %}
-      {{ render_comments(comments) }}
-    {% else %}
-      <p class="text-muted text-center">No comments yet.</p>
-    {% endif %}
-
-    <h3 class="mt-5 mb-3 text-center">Post a Comment</h3>
-    <form method="post" action="{{ url_for('board_comments', board_id=board_id) }}">
-      <div class="mb-3">
-        <textarea class="form-control comment-input" name="comment_text" rows="5" placeholder="Write a comment..." required></textarea>
+{% extends "layout.html" %} {% macro render_comments(comments, level=0) %}
+<div class="comment-list">
+  {% for item in comments %}
+  <div class="comment-item">
+    <div class="comment-avatar">{{ item.comment.Username[:2].upper() }}</div>
+    <div class="comment-content">
+      <div class="comment-header">
+        <strong class="username">{{ item.comment.Username }}</strong>
+        <small class="comment-date"
+          >{{ item.comment.Date.strftime('%B %d, %Y %H:%M') if item.comment.Date
+          else '' }}</small
+        >
       </div>
-      <button type="submit" class="btn btn-primary btn-lg w-100">Post Comment</button>
-    </form>
+
+      <p class="comment-text">{{ item.comment.Text }}</p>
+
+      <div class="comment-actions">
+        <button
+          class="reply-btn"
+          onclick="showReplyForm({{ item.comment.CommentID }})"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M9.502 5.513a.144.144 0 0 0-.202.134V6.65a.5.5 0 0 1-.5.5c-.667 0-2.013.005-3.3.822-.984.624-1.99 1.76-2.595 3.876 1.02-.983 2.185-1.516 3.205-1.799a8.74 8.74 0 0 1 1.921-.306 7.57 7.57 0 0 1 .798.008h.013l.005.001h.001L8.8 9.9l-.05-.498a.5.5 0 0 1 .45.498v1.153c0 .108.11.176.202.134l3.984-2.933a.494.494 0 0 1 .042-.028.147.147 0 0 0 0-.252.494.494 0 0 1-.042-.028L9.502 5.513zM8.3 10.386a7.745 7.745 0 0 0-1.923.277c-1.326.368-2.896 1.201-3.94 3.08a.5.5 0 0 1-.933-.305c.464-3.71 1.886-5.662 3.46-6.66 1.245-.79 2.527-.942 3.336-.971v-.66a1.144 1.144 0 0 1 1.767-.96l3.994 2.94a1.147 1.147 0 0 1 0 1.946l-3.994 2.94a1.144 1.144 0 0 1-1.767-.96v-.667z"
+            />
+          </svg>
+          Reply
+        </button>
+        <span class="reply-count"
+          >{% if item.replies %}{{ item.replies|length }} {% if
+          item.replies|length == 1 %}Reply{% else %}Replies{% endif %}{% endif
+          %}</span
+        >
+      </div>
+
+      <div id="reply-form-{{ item.comment.CommentID }}" class="reply-form">
+        <form
+          method="post"
+          action="{{ url_for('board_comments', board_id=board_id) }}"
+        >
+          <input
+            type="hidden"
+            name="parent_comment_id"
+            value="{{ item.comment.CommentID }}"
+          />
+          <textarea
+            class="form-control comment-input"
+            name="comment_text"
+            rows="3"
+            placeholder="Write a reply..."
+            required
+          ></textarea>
+          <button type="submit" class="btn btn-reply">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"
+              />
+            </svg>
+            Post Reply
+          </button>
+        </form>
+      </div>
+
+      {% if item.replies %}
+      <div class="nested-comments {% if level > 0 %}nested-border{% endif %}">
+        {{ render_comments(item.replies, level + 1) }}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endmacro %} {% block title %} Comments{% if board_theme %} for {{ board_theme
+}}{% endif %} {% endblock %} {% block main %}
+<style>
+  html {
+    height: 100%;
+  }
+
+  body {
+    background-color: #f8f9fa;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    min-height: 100%;
+    position: relative;
+    padding-bottom: 380px; /* Adjust this value to match the height of your footer */
+    margin: 0;
+  }
+
+  .container {
+    max-width: 800px;
+    padding: 0 15px;
+  }
+
+  .board-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .board-title {
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 0.5rem;
+  }
+
+  .board-description {
+    color: #6c757d;
+    font-size: 1.1rem;
+  }
+
+  .comment-list {
+    margin-bottom: 1.5rem;
+  }
+
+  .comment-item {
+    display: flex;
+    margin-bottom: 1.5rem;
+  }
+
+  .comment-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: #4361ee;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1rem;
+    margin-right: 15px;
+    flex-shrink: 0;
+  }
+
+  .comment-content {
+    flex: 1;
+    background: white;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  }
+
+  .comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .username {
+    color: #212529;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .comment-date {
+    color: #6c757d;
+    font-size: 0.85rem;
+  }
+
+  .comment-text {
+    font-size: 1rem;
+    color: #495057;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  .comment-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 8px;
+  }
+
+  .reply-btn {
+    background: none;
+    border: none;
+    color: #4361ee;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .reply-btn:hover {
+    color: #3a56d4;
+    text-decoration: underline;
+  }
+
+  .reply-count {
+    font-size: 0.85rem;
+    color: #6c757d;
+  }
+
+  .reply-form {
+    display: none;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e9ecef;
+  }
+
+  .comment-input {
+    width: 100%;
+    padding: 10px 15px;
+    font-size: 0.95rem;
+    resize: none;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+
+  .comment-input:focus {
+    outline: none;
+    border-color: #4361ee;
+    box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+  }
+
+  .btn-reply {
+    background-color: #4361ee;
+    border: none;
+    color: white;
+    font-size: 0.9rem;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-reply:hover {
+    background-color: #3a56d4;
+  }
+
+  .nested-comments {
+    margin-top: 15px;
+    padding-left: 15px;
+  }
+
+  .nested-border {
+    border-left: 2px solid #e9ecef;
+  }
+
+  .alert {
+    font-size: 0.95rem;
+    border-radius: 8px;
+  }
+
+  .new-comment-section {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    margin-top: 2rem;
+  }
+
+  .new-comment-header {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  .message-input-container {
+    display: flex;
+    margin-top: 2rem;
+  }
+
+  .message-input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 8px 0 0 8px;
+    font-size: 1rem;
+  }
+
+  .message-input:focus {
+    outline: none;
+    border-color: #4361ee;
+  }
+
+  .send-button {
+    background-color: #4361ee;
+    color: white;
+    border: none;
+    border-radius: 0 8px 8px 0;
+    padding: 0 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .send-button:hover {
+    background-color: #3a56d4;
+  }
+
+  .btn-primary {
+    background-color: #4361ee;
+    border-color: #4361ee;
+  }
+
+  .btn-primary:hover {
+    background-color: #3a56d4;
+    border-color: #3a56d4;
+  }
+
+  /* Footer Styles */
+  .mindscape-footer {
+    background-color: #1a3679;
+    color: white;
+    padding: 2rem 0;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+  }
+
+  .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .footer-brand {
+    flex: 0 0 300px;
+    margin-bottom: 1.5rem;
+  }
+
+  .brand-logo {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .logo-circle {
+    background-color: #4361ee;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 0.75rem;
+  }
+
+  .brand-name {
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .brand-description {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .footer-nav {
+    display: flex;
+    flex: 1;
+    justify-content: space-around;
+    flex-wrap: wrap;
+  }
+
+  .footer-section {
+    margin: 0 1rem 1.5rem;
+    min-width: 150px;
+  }
+
+  .footer-section h4 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+
+  .footer-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .footer-section li {
+    margin-bottom: 0.75rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .footer-section a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-section a:hover {
+    color: white;
+    text-decoration: underline;
+  }
+
+  .footer-bottom {
+    width: 100%;
+    padding: 1rem 20px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  @media (max-width: 768px) {
+    .footer-content {
+      flex-direction: column;
+    }
+
+    .footer-nav {
+      justify-content: flex-start;
+    }
+
+    .footer-bottom {
+      flex-direction: column;
+      text-align: center;
+      gap: 0.5rem;
+    }
+
+    body {
+      padding-bottom: 500px; /* Increase padding for smaller screens where footer is taller */
+    }
+  }
+</style>
+
+<div class="container my-5">
+  <div class="board-header">
+    <h2 class="board-title">MoodBoard Discussion</h2>
+    <p class="board-description">
+      Chat with your neighbors about {% if board_theme %}"{{ board_theme }}"{%
+      else %}MoodBoard topics{% endif %}
+    </p>
   </div>
 
-  <script>
-    function showReplyForm(commentId) {
-      const form = document.getElementById("reply-form-" + commentId);
-      form.style.display = (form.style.display === "none" || form.style.display === "") ? "block" : "none";
-    }
-  </script>
+  {% with messages = get_flashed_messages(with_categories=true) %} {% if
+  messages %}
+  <div class="flashes mb-4">
+    {% for category, message in messages %}
+    <div
+      class="alert alert-{{ category }} alert-dismissible fade show"
+      role="alert"
+    >
+      {{ message }}
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="alert"
+        aria-label="Close"
+      ></button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %} {% endwith %} {% if comments %} {{ render_comments(comments) }} {%
+  else %}
+  <div class="text-center py-5">
+    <p class="text-muted">
+      No comments yet. Be the first to start the conversation!
+    </p>
+  </div>
+  {% endif %}
+
+  <div class="new-comment-section">
+    <div class="new-comment-header">Post a message to the MoodBoard</div>
+
+    <form
+      method="post"
+      action="{{ url_for('board_comments', board_id=board_id) }}"
+    >
+      <textarea
+        class="form-control comment-input"
+        name="comment_text"
+        rows="4"
+        placeholder="Write a message to the MoodBoard..."
+        required
+      ></textarea>
+
+      <div class="d-flex justify-content-end mt-3">
+        <button type="submit" class="btn btn-primary">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+            style="margin-right: 6px"
+          >
+            <path
+              d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"
+            />
+          </svg>
+          Post Message
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- Hard-coded Footer -->
+<div class="mindscape-footer">
+  <div class="footer-content">
+    <div class="footer-brand">
+      <div class="brand-logo">
+        <div class="logo-circle">MS</div>
+        <div class="brand-name">MindScape</div>
+      </div>
+      <p class="brand-description">
+        MindScape is a digital sanctuary designed to support student mental
+        health and well-being through mood tracking, shared experiences, and
+        community care.
+      </p>
+    </div>
+
+    <div class="footer-nav">
+      <div class="footer-section">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="#">MoodBoard</a></li>
+          <li><a href="#">Shared Stories</a></li>
+          <li><a href="#">Help Resources</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="#">Community</a></li>
+          <li><a href="#">Self-Help Guides</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h4>Contact</h4>
+        <ul>
+          <li>Email: support@mindscape.pk</li>
+          <li>Phone: +92 312 3456789</li>
+          <li>Location: GIKI, Pakistan</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>© 2025 MindScape. All rights reserved.</p>
+    <p>Made with <i class="fas fa-heart"></i> for students everywhere</p>
+  </div>
+</div>
+
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+/>
+
+<script>
+  function showReplyForm(commentId) {
+    const form = document.getElementById("reply-form-" + commentId);
+    form.style.display =
+      form.style.display === "none" || form.style.display === ""
+        ? "block"
+        : "none";
+  }
+</script>
 {% endblock %}

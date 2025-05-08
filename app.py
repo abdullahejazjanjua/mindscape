@@ -5,6 +5,17 @@ import psycopg2
 from config import config_
 from collections import defaultdict
 
+from flask import jsonify
+
+from rag_bot import MentalHealthChatbot  # Save the chatbot class in a separate file (e.g., rag_bot.py)
+
+chatbot_instance = MentalHealthChatbot()
+chatbot_instance.load_or_create_knowledge_base()
+chatbot_instance.initialize_chain()
+
+
+
+
 
 # Configure application
 app = Flask(__name__)
@@ -17,6 +28,21 @@ Session(app)
 params = config_()
 connection = psycopg2.connect(**params)
 crsr = connection.cursor()
+
+@app.route('/mental_health_chatbot', methods=['GET', 'POST'])
+def mental_health_chatbot():
+    if request.method == 'POST':
+        user_input = request.form.get('user_input', '').strip()
+        if user_input:
+            try:
+                response = chatbot_instance.retrieval_chain.invoke({"input": user_input})
+                answer = response['answer']
+                return render_template("mental_chatbot.html", answer=answer, user_input=user_input)
+            except Exception as e:
+                return render_template("mental_chatbot.html", error=str(e))
+        else:
+            flash('Please enter a message.', 'error')
+    return render_template("mental_chatbot.html")
 
 @app.route('/')
 def home():

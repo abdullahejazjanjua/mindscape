@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Mental Health Chatbot
+{% endblock %}
+
+{% block main %}
+<div class="container mt-5">
+    <div class="card shadow mx-auto" style="max-width: 600px;">
+        <div class="card-body">
+            <h2 class="card-title text-center mb-4">Mental Health Chatbot</h2>
+            <form method="POST">
+                <div class="mb-3">
+                    <textarea name="user_input" class="form-control" placeholder="Ask something..." required rows="4"></textarea>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Send</button>
+                </div>
+            </form>
+            <div class="mt-4">
+                {% if user_input %}
+                    <div class="alert alert-info"><strong>You:</strong> {{ user_input }}</div>
+                {% endif %}
+                {% if answer %}
+                    <div class="alert alert-success"><strong>Bot:</strong> {{ answer }}</div>
+                {% endif %}
+                {% if error %}
+                    <div class="alert alert-danger"><strong>Error:</strong> {{ error }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

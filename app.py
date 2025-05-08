@@ -102,8 +102,16 @@ def communities():
         {"BoardID": row[0], "Theme": row[1], "Date_Created": row[2], "path_to": row[3]}
         for row in rows
     ]
+    
+    crsr.execute("SELECT * FROM MOD_Board;")
+    rowsx = crsr.fetchall()
+    
+    mods = [
+        {"UserID": row[0], "ModID": row[1], "BoardID": row[2]}
+        for row in rowsx
+    ]
 
-    return render_template('communities.html', boards=boards)
+    return render_template('communities.html', boards=boards, mods=mods)
 
 
 

@@ -1,39 +1,255 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="initial-scale=1, width=device-width">
-        <!-- http://getbootstrap.com/docs/5.3/ -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-        <!-- https://favicon.io/emoji-favicons/money-bag/ -->
-        <link href="/static/styles.css" rel="stylesheet">
-        <title>MindScape {% block title %}{% endblock %}</title>
-    </head>
-    <body>
-        <nav class="bg-light border navbar navbar-expand-md navbar-light">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="/"><span class="blue">M</span><span class="red">i</span><span class="yellow">n</span><span class="green">d</span><span class="blue">S</span><span class="red">c</span><span class="yellow">a</span><span class="green">p</span><span class="blue">e</span></a>
-                <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbar">
-                    {% if session["user_id"] %}
-                        
-                        <ul class="navbar-nav ms-auto mt-2">
-                            <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
-                        </ul>
-                    {% else %}
-                        <ul class="navbar-nav ms-auto mt-2">
-                            <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/login">Log In</a></li>
-                        </ul>
-                    {% endif %}
-                </div>
-            </div>
-        </nav>
-        <main class="container py-5 text-center">
-            {% block main %}{% endblock %}
-        </main>
-    </body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, width=device-width" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+    <link href="/static/styles.css" rel="stylesheet" />
+    <title>MindScape {% block title %}{% endblock %}</title>
+    <style>
+      /* Footer Styles */
+      .mindscape-footer {
+        background-color: #1a3679;
+        color: white;
+        padding: 2rem 0;
+        width: 100%;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+      }
+
+      .footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      .footer-brand {
+        flex: 0 0 300px;
+        margin-bottom: 1.5rem;
+      }
+
+      .brand-logo {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      .logo-circle {
+        background-color: #4361ee;
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-right: 0.75rem;
+      }
+
+      .brand-name {
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+
+      .brand-description {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .footer-nav {
+        display: flex;
+        flex: 1;
+        justify-content: space-around;
+        flex-wrap: wrap;
+      }
+
+      .footer-section {
+        margin: 0 1rem 1.5rem;
+        min-width: 150px;
+      }
+
+      .footer-section h4 {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+      }
+
+      .footer-section ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .footer-section li {
+        margin-bottom: 0.75rem;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .footer-section a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+
+      .footer-section a:hover {
+        color: white;
+        text-decoration: underline;
+      }
+
+      .footer-bottom {
+        width: 100%;
+        padding: 1rem 20px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        justify-content: space-between;
+        max-width: 1200px;
+        margin: 0 auto;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      @media (max-width: 768px) {
+        .footer-content {
+          flex-direction: column;
+        }
+
+        .footer-nav {
+          justify-content: flex-start;
+        }
+
+        .footer-bottom {
+          flex-direction: column;
+          text-align: center;
+          gap: 0.5rem;
+        }
+      }
+
+      /* Body styles for footer spacing */
+      body {
+        position: relative;
+        min-height: 100vh;
+        padding-bottom: 380px;
+      }
+
+      @media (max-width: 768px) {
+        body {
+          padding-bottom: 500px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="bg-light border navbar navbar-expand-md navbar-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/"
+          ><span class="blue">M</span><span class="red">i</span
+          ><span class="yellow">n</span><span class="green">d</span
+          ><span class="blue">S</span><span class="red">c</span
+          ><span class="yellow">a</span><span class="green">p</span
+          ><span class="blue">e</span></a
+        >
+        <button
+          aria-controls="navbar"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+          class="navbar-toggler"
+          data-bs-target="#navbar"
+          data-bs-toggle="collapse"
+          type="button"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbar">
+          {% if session["user_id"] %}
+          <ul class="navbar-nav ms-auto mt-2">
+            <li class="nav-item">
+              <a class="nav-link" href="/logout">Log Out</a>
+            </li>
+          </ul>
+          {% else %}
+          <ul class="navbar-nav ms-auto mt-2">
+            <li class="nav-item">
+              <a class="nav-link" href="/register">Register</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/login">Log In</a>
+            </li>
+          </ul>
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+    <main class="container py-5 text-center">
+      {% block main %}{% endblock %}
+    </main>
+
+    <div class="mindscape-footer">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <div class="brand-logo">
+            <div class="logo-circle">MS</div>
+            <div class="brand-name">MindScape</div>
+          </div>
+          <p class="brand-description">
+            MindScape is a digital sanctuary designed to support student mental
+            health and well-being through mood tracking, shared experiences, and
+            community care.
+          </p>
+        </div>
+
+        <div class="footer-nav">
+          <div class="footer-section">
+            <h4>Explore</h4>
+            <ul>
+              <li><a href="#">MoodBoard</a></li>
+              <li><a href="#">Shared Stories</a></li>
+              <li><a href="#">Help Resources</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-section">
+            <h4>Support</h4>
+            <ul>
+              <li><a href="#">Community</a></li>
+              <li><a href="#">Self-Help Guides</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-section">
+            <h4>Contact</h4>
+            <ul>
+              <li>Email: support@mindscape.pk</li>
+              <li>Phone: +92 312 3456789</li>
+              <li>Location: GIKI, Pakistan</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© 2025 MindScape. All rights reserved.</p>
+        <p>Made with <i class="fas fa-heart"></i> for students everywhere</p>
+      </div>
+    </div>
+  </body>
 </html>

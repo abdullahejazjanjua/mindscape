@@ -1,38 +1,591 @@
-{% extends "layout.html" %}
+{% extends "layout.html" %} {% block title %} Communities {% endblock %} {%
+block main %}
+<style>
+  /* Footer Styles */
+  .mindscape-footer {
+    background-color: #1a3679;
+    color: white;
+    padding: 2rem 0;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+  }
 
-{% block title %}
-  Communities
-{% endblock %}
+  .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    flex-wrap: wrap;
+  }
 
-{% block main %}
-<div class="tab-pane fade show active" id="my-moodboards" role="tabpanel" aria-labelledby="my-moodboards-tab">
+  .footer-brand {
+    flex: 0 0 300px;
+    margin-bottom: 1.5rem;
+  }
+
+  .brand-logo {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .brand-name {
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .brand-description {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .footer-nav {
+    display: flex;
+    flex: 1;
+    justify-content: space-around;
+    flex-wrap: wrap;
+  }
+
+  .footer-section {
+    margin: 0 1rem 1.5rem;
+    min-width: 150px;
+  }
+
+  .footer-section h4 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+
+  .footer-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .footer-section li {
+    margin-bottom: 0.75rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .footer-section a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-section a:hover {
+    color: white;
+    text-decoration: underline;
+  }
+
+  .footer-bottom {
+    width: 100%;
+    padding: 1rem 20px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  @media (max-width: 768px) {
+    .footer-content {
+      flex-direction: column;
+    }
+
+    .footer-nav {
+      justify-content: flex-start;
+    }
+
+    .footer-bottom {
+      flex-direction: column;
+      text-align: center;
+      gap: 0.5rem;
+    }
+  }
+
+  /* Ensure body has proper spacing for footer */
+  body {
+    position: relative;
+    min-height: 100vh;
+    padding-bottom: 380px;
+  }
+
+  /* Main content styles */
+  .tab-pane {
+    padding-bottom: 2rem;
+  }
+</style>
+
+<div
+  class="tab-pane fade show active"
+  id="my-moodboards"
+  role="tabpanel"
+  aria-labelledby="my-moodboards-tab"
+>
   <div class="row g-4 mb-5">
-
     {% for board in boards %}
     <div class="col-md-6 col-lg-4">
       <div class="card shadow-sm h-100">
-        <img src="{{ url_for('static', filename='images/default.jpg') }}" class="card-img-top" alt="{{ board['Theme'] }}" style="height: 200px; object-fit: cover;">
+        <img
+          src="{{ url_for('static', filename='images/default.jpg') }}"
+          class="card-img-top"
+          alt="{{ board['Theme'] }}"
+          style="height: 200px; object-fit: cover"
+        />
         <div class="card-body d-flex flex-column">
           <h5 class="card-title fw-semibold">{{ board['Theme'] }}</h5>
           <div class="d-flex align-items-center text-muted small mb-2">
             <i class="bi bi-calendar3 me-1"></i>
             Created on {{ board['Date_Created'].strftime('%B %d, %Y') }}
           </div>
-          <p class="card-text text-secondary small flex-grow-1">No description available.</p>
+          <p class="card-text text-secondary small flex-grow-1">
+            No description available.
+          </p>
           <div class="d-flex gap-2 mt-3">
-            <a href="/board/{{ board['BoardID'] }}" class="btn btn-sm btn-outline-primary">View</a>
+            <a
+              href="/board/{{ board['BoardID'] }}"
+              class="btn btn-sm btn-outline-primary"
+              >View</a
+            >
             <button class="btn btn-sm btn-outline-danger">Leave</button>
           </div>
         </div>
       </div>
     </div>
-    {% endfor %}
-
-    {% if boards|length == 0 %}
-    <p class="text-center text-muted mt-5">You haven't joined any MoodBoards yet.</p>
+    {% endfor %} {% if boards|length == 0 %}
+    <p class="text-center text-muted mt-5">
+      You haven't joined any MoodBoards yet.
+    </p>
     {% endif %}
-
   </div>
 </div>
 
+<!-- Hardcoded Footer -->
+<div class="mindscape-footer">
+  <div class="footer-content">
+    <div class="footer-brand">
+      <div class="brand-logo">
+        <div class="logo-circle">MS</div>
+        <div class="brand-name">MindScape</div>
+      </div>
+      <p class="brand-description">
+        MindScape is a digital sanctuary designed to support student mental
+        health and well-being through mood tracking, shared experiences, and
+        community care.
+      </p>
+    </div>
+
+    <div class="footer-nav">
+      <div class="footer-section">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="#">MoodBoard</a></li>
+          <li><a href="#">Shared Stories</a></li>
+          <li><a href="#">Help Resources</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="#">Community</a></li>
+          <li><a href="#">Self-Help Guides</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h4>Contact</h4>
+        <ul>
+          <li>Email: support@mindscape.pk</li>
+          <li>Phone: +92 312 3456789</li>
+          <li>Location: GIKI, Pakistan</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>© 2025 MindScape. All rights reserved.</p>
+    <p>Made with <i class="fas fa-heart"></i> for students everywhere</p>
+  </div>
+</div>
+<style>
+  html {
+    height: 100%;
+  }
+
+  body {
+    background-color: #f8f9fa;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    min-height: 100%;
+    position: relative;
+    padding-bottom: 380px; /* Adjust this value to match the height of your footer */
+    margin: 0;
+  }
+
+  .container {
+    max-width: 800px;
+    padding: 0 15px;
+  }
+
+  .board-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .board-title {
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 0.5rem;
+  }
+
+  .board-description {
+    color: #6c757d;
+    font-size: 1.1rem;
+  }
+
+  .comment-list {
+    margin-bottom: 1.5rem;
+  }
+
+  .comment-item {
+    display: flex;
+    margin-bottom: 1.5rem;
+  }
+
+  .comment-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: #4361ee;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1rem;
+    margin-right: 15px;
+    flex-shrink: 0;
+  }
+
+  .comment-content {
+    flex: 1;
+    background: white;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  }
+
+  .comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .username {
+    color: #212529;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .comment-date {
+    color: #6c757d;
+    font-size: 0.85rem;
+  }
+
+  .comment-text {
+    font-size: 1rem;
+    color: #495057;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  .comment-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 8px;
+  }
+
+  .reply-btn {
+    background: none;
+    border: none;
+    color: #4361ee;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .reply-btn:hover {
+    color: #3a56d4;
+    text-decoration: underline;
+  }
+
+  .reply-count {
+    font-size: 0.85rem;
+    color: #6c757d;
+  }
+
+  .reply-form {
+    display: none;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e9ecef;
+  }
+
+  .comment-input {
+    width: 100%;
+    padding: 10px 15px;
+    font-size: 0.95rem;
+    resize: none;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+
+  .comment-input:focus {
+    outline: none;
+    border-color: #4361ee;
+    box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+  }
+
+  .btn-reply {
+    background-color: #4361ee;
+    border: none;
+    color: white;
+    font-size: 0.9rem;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-reply:hover {
+    background-color: #3a56d4;
+  }
+
+  .nested-comments {
+    margin-top: 15px;
+    padding-left: 15px;
+  }
+
+  .nested-border {
+    border-left: 2px solid #e9ecef;
+  }
+
+  .alert {
+    font-size: 0.95rem;
+    border-radius: 8px;
+  }
+
+  .new-comment-section {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    margin-top: 2rem;
+  }
+
+  .new-comment-header {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  .message-input-container {
+    display: flex;
+    margin-top: 2rem;
+  }
+
+  .message-input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 8px 0 0 8px;
+    font-size: 1rem;
+  }
+
+  .message-input:focus {
+    outline: none;
+    border-color: #4361ee;
+  }
+
+  .send-button {
+    background-color: #4361ee;
+    color: white;
+    border: none;
+    border-radius: 0 8px 8px 0;
+    padding: 0 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .send-button:hover {
+    background-color: #3a56d4;
+  }
+
+  .btn-primary {
+    background-color: #4361ee;
+    border-color: #4361ee;
+  }
+
+  .btn-primary:hover {
+    background-color: #3a56d4;
+    border-color: #3a56d4;
+  }
+
+  /* Footer Styles */
+  .mindscape-footer {
+    background-color: #1a3679;
+    color: white;
+    padding: 2rem 0;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+  }
+
+  .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .footer-brand {
+    flex: 0 0 300px;
+    margin-bottom: 1.5rem;
+  }
+
+  .brand-logo {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .logo-circle {
+    background-color: #4361ee;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 0.75rem;
+  }
+
+  .brand-name {
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .brand-description {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .footer-nav {
+    display: flex;
+    flex: 1;
+    justify-content: space-around;
+    flex-wrap: wrap;
+  }
+
+  .footer-section {
+    margin: 0 1rem 1.5rem;
+    min-width: 150px;
+  }
+
+  .footer-section h4 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+
+  .footer-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .footer-section li {
+    margin-bottom: 0.75rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .footer-section a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-section a:hover {
+    color: white;
+    text-decoration: underline;
+  }
+
+  .footer-bottom {
+    width: 100%;
+    padding: 1rem 20px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  @media (max-width: 768px) {
+    .footer-content {
+      flex-direction: column;
+    }
+
+    .footer-nav {
+      justify-content: flex-start;
+    }
+
+    .footer-bottom {
+      flex-direction: column;
+      text-align: center;
+      gap: 0.5rem;
+    }
+
+    body {
+      padding-bottom: 500px; /* Increase padding for smaller screens where footer is taller */
+    }
+  }
+</style>
+
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+/>
 {% endblock %}

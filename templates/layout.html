@@ -13,6 +13,10 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
+    />
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
@@ -21,6 +25,133 @@
     <link href="/static/styles.css" rel="stylesheet" />
     <title>MindScape {% block title %}{% endblock %}</title>
     <style>
+      /* Navbar Styles */
+      .navbar {
+        background: #1a3679;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        padding: 0.8rem 1rem;
+      }
+
+      .navbar-brand {
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        background: linear-gradient(
+          90deg,
+          rgb(195, 198, 212),
+          rgb(201, 195, 216),
+          rgb(50, 56, 223)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        position: relative;
+        padding: 0 0.5rem;
+      }
+
+      .navbar-brand::after {
+        content: "";
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(
+          rgb(195, 198, 212),
+          rgb(201, 195, 216),
+          rgb(141, 144, 228)
+        );
+        border-radius: 3px;
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+      }
+
+      .navbar-brand:hover::after {
+        transform: scaleX(1);
+      }
+
+      .nav-link {
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        margin: 0 0.2rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+      }
+
+      .nav-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .btn-logout {
+        background: linear-gradient(135deg, #ff4d4d 0%, #d00000 100%);
+        color: white;
+        border: none;
+        padding: 0.5rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(255, 77, 77, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .btn-logout:hover {
+        background: linear-gradient(135deg, #d00000 0%, #9d0208 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(255, 77, 77, 0.2);
+        color: white;
+      }
+
+      .btn-login {
+        background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+        color: white;
+        border: none;
+        padding: 0.5rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(67, 97, 238, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .btn-login:hover {
+        background: linear-gradient(135deg, #3a56d4 0%, #2a0a8a 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(67, 97, 238, 0.2);
+        color: white;
+      }
+
+      .btn-register {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0.5rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .btn-register:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+        color: white;
+      }
+
+      .navbar-toggler {
+        border: none;
+        color: white;
+      }
+
+      .navbar-toggler:focus {
+        box-shadow: none;
+      }
+
       /* Footer Styles */
       .mindscape-footer {
         background-color: #1a3679;
@@ -128,6 +259,14 @@
         color: rgba(255, 255, 255, 0.6);
       }
 
+      /* Body styles for footer spacing */
+      body {
+        position: relative;
+        min-height: 100vh;
+        padding-bottom: 380px;
+        background-color: #f8f9fa;
+      }
+
       @media (max-width: 768px) {
         .footer-content {
           flex-direction: column;
@@ -142,32 +281,27 @@
           text-align: center;
           gap: 0.5rem;
         }
-      }
 
-      /* Body styles for footer spacing */
-      body {
-        position: relative;
-        min-height: 100vh;
-        padding-bottom: 380px;
-      }
-
-      @media (max-width: 768px) {
         body {
           padding-bottom: 500px;
+        }
+
+        .navbar-brand {
+          font-size: 1.5rem;
+        }
+
+        .nav-link {
+          margin: 0.2rem 0;
         }
       }
     </style>
   </head>
   <body>
-    <nav class="bg-light border navbar navbar-expand-md navbar-light">
+    <nav class="navbar navbar-expand-md navbar-dark">
       <div class="container-fluid">
-        <a class="navbar-brand" href="/"
-          ><span class="blue">M</span><span class="red">i</span
-          ><span class="yellow">n</span><span class="green">d</span
-          ><span class="blue">S</span><span class="red">c</span
-          ><span class="yellow">a</span><span class="green">p</span
-          ><span class="blue">e</span></a
-        >
+        <a class="navbar-brand" href="/">
+          <span>MindScape</span>
+        </a>
         <button
           aria-controls="navbar"
           aria-expanded="false"
@@ -183,16 +317,22 @@
           {% if session["user_id"] %}
           <ul class="navbar-nav ms-auto mt-2">
             <li class="nav-item">
-              <a class="nav-link" href="/logout">Log Out</a>
+              <a class="nav-link btn-logout" href="/logout">
+                <i class="bi bi-box-arrow-right"></i> Log Out
+              </a>
             </li>
           </ul>
           {% else %}
           <ul class="navbar-nav ms-auto mt-2">
             <li class="nav-item">
-              <a class="nav-link" href="/register">Register</a>
+              <a class="nav-link btn-register" href="/register">
+                <i class="bi bi-person-plus"></i> Register
+              </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/login">Log In</a>
+              <a class="nav-link btn-login" href="/login">
+                <i class="bi bi-box-arrow-in-right"></i> Log In
+              </a>
             </li>
           </ul>
           {% endif %}

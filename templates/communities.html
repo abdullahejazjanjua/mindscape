@@ -43,6 +43,15 @@ block main %}
     line-height: 1.6;
   }
 
+  /* Card Container */
+  .cards-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding: 1rem 0;
+  }
+
   /* Card Styles */
   .board-card {
     border: none;
@@ -50,7 +59,8 @@ block main %}
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
-    height: 100%;
+    width: 100%;
+    max-width: 350px;
     display: flex;
     flex-direction: column;
     background: white;
@@ -85,11 +95,13 @@ block main %}
     font-weight: 600;
     color: #212529;
     margin-bottom: 0.75rem;
+    text-align: center;
   }
 
   .card-meta {
     display: flex;
     align-items: center;
+    justify-content: center;
     margin-bottom: 1rem;
     font-size: 0.85rem;
     color: #6c757d;
@@ -107,6 +119,7 @@ block main %}
     line-height: 1.5;
     margin-bottom: 1.5rem;
     flex-grow: 1;
+    text-align: center;
   }
 
   /* Button Styles */
@@ -114,6 +127,8 @@ block main %}
     display: flex;
     gap: 0.75rem;
     margin-top: auto;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
   .btn-view {
@@ -125,7 +140,7 @@ block main %}
     font-weight: 500;
     transition: all 0.3s ease;
     box-shadow: 0 4px 6px rgba(67, 97, 238, 0.15);
-    flex: 1;
+    min-width: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -147,7 +162,7 @@ block main %}
     border-radius: 8px;
     font-weight: 500;
     transition: all 0.3s ease;
-    flex: 1;
+    min-width: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -169,7 +184,7 @@ block main %}
     border-radius: 8px;
     font-weight: 500;
     transition: all 0.3s ease;
-    flex: 1;
+    min-width: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -187,6 +202,7 @@ block main %}
   .empty-state {
     text-align: center;
     padding: 4rem 0;
+    width: 100%;
   }
 
   .empty-icon {
@@ -240,7 +256,12 @@ block main %}
     }
 
     .card-actions {
-      flex-direction: column;
+      flex-direction: row;
+      justify-content: center;
+    }
+
+    .board-card {
+      max-width: 100%;
     }
   }
 </style>
@@ -254,36 +275,34 @@ block main %}
     </p>
   </div>
 
-  <div class="row g-4">
+  <div class="cards-container">
     {% for board in boards %}
-    <div class="col-md-6 col-lg-4">
-      <div class="card board-card">
-        <img
-          src="{{ url_for('static', filename=board['path_to']) }}"
-          class="board-image"
-          alt="{{ board['Theme'] }}"
-        />
-        <div class="card-body">
-          <h5 class="card-title">{{ board['Theme'] }}</h5>
-          <div class="card-meta">
-            <i class="bi bi-calendar3"></i>
-            Created {{ board['Date_Created'].strftime('%b %d, %Y') }}
-          </div>
-          <p class="card-description">
-            {{ board['Description'] or 'Join this community to connect with
-            others and share experiences' }}
-          </p>
-          <div class="card-actions">
-            <a href="/board/{{ board['BoardID'] }}" class="btn btn-view">
-              <i class="bi bi-eye-fill"></i> View
-            </a>
-            <button class="btn btn-leave">
-              <i class="bi bi-x-lg"></i> Leave
-            </button>
-            <button class="btn btn-delete">
-              <i class="bi bi-trash"></i> Delete
-            </button>
-          </div>
+    <div class="board-card">
+      <img
+        src="{{ url_for('static', filename=board['path_to']) }}"
+        class="board-image"
+        alt="{{ board['Theme'] }}"
+      />
+      <div class="card-body">
+        <h5 class="card-title">{{ board['Theme'] }}</h5>
+        <div class="card-meta">
+          <i class="bi bi-calendar3"></i>
+          Created {{ board['Date_Created'].strftime('%b %d, %Y') }}
+        </div>
+        <p class="card-description">
+          {{ board['Description'] or 'Join this community to connect with others
+          and share experiences' }}
+        </p>
+        <div class="card-actions">
+          <a href="/board/{{ board['BoardID'] }}" class="btn btn-view">
+            <i class="bi bi-eye-fill"></i> View
+          </a>
+          <button class="btn btn-leave">
+            <i class="bi bi-x-lg"></i> Leave
+          </button>
+          <button class="btn btn-delete">
+            <i class="bi bi-trash"></i> Delete
+          </button>
         </div>
       </div>
     </div>

@@ -99,7 +99,7 @@ def communities():
     rows = crsr.fetchall()
 
     boards = [
-        {"BoardID": row[0], "Theme": row[1], "Date_Created": row[2]}
+        {"BoardID": row[0], "Theme": row[1], "Date_Created": row[2], "path_to": row[3]}
         for row in rows
     ]
 

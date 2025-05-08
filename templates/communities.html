@@ -135,7 +135,7 @@ block main %}
     <div class="col-md-6 col-lg-4">
       <div class="card shadow-sm h-100">
         <img
-          src="{{ url_for('static', filename='images/default.jpg') }}"
+          src="{{ url_for('static', filename=board['path_to']) }}"
           class="card-img-top"
           alt="{{ board['Theme'] }}"
           style="height: 200px; object-fit: cover"

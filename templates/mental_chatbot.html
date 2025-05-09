@@ -168,6 +168,40 @@
             max-width: 90%;
         }
     }
+    .chat-messages {
+        margin-top: 2rem;
+        margin-bottom: 2rem; /* 👈 Add this */
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        max-height: 400px;
+        overflow-y: auto;
+        padding-right: 0.5rem;
+    }
+.btn-clear {
+    background: linear-gradient(135deg, #ef476f 0%, #d72638 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(239, 71, 111, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 1rem auto 0;
+}
+
+.btn-clear:hover {
+    background: linear-gradient(135deg, #d72638 0%, #a30d2d 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(239, 71, 111, 0.4);
+}
+
 </style>
 
 <div class="chatbot-container">
@@ -178,6 +212,36 @@
         </div>
         
         <div class="chatbot-body">
+            
+            <div class="chat-messages">
+                {% if answer %}
+                {% for ans in answer%}
+                    <div class="message user-message">
+                        <strong>You:</strong>
+                        <p>{{ ans['user_input'] }}</p>
+                    </div>
+                
+                    <div class="message bot-message">
+                        <strong>MindScape Bot:</strong>
+                        <p>{{ ans['bot_answer'] }}</p>
+                    </div>
+                    {%endfor%}
+                {% else %}
+                    <div class="message bot-message">
+                        <strong>MindScape Bot:</strong>
+                        <p>Hi there! 👋 I'm MindScape, your mental wellness companion. Feel free to share anything that's on your mind — I'm here to listen and support you.</p>
+                    </div>
+                {% endif %}
+
+                
+                {% if error %}
+                    <div class="message error-message">
+                        <strong>Error:</strong>
+                        <p>{{ error }}</p>
+                    </div>
+                {% endif %}
+            </div>
+
             <form method="POST">
                 <textarea 
                     name="user_input" 
@@ -189,30 +253,12 @@
                 <button type="submit" class="btn-send">
                     <i class="bi bi-send-fill"></i> Send Message
                 </button>
+                <button type="submit" name="action" value="clear" class="btn-clear" formnovalidate>
+                    <i class="bi bi-trash-fill"></i> Clear Chat
+                </button>
+
+
             </form>
-            
-            <div class="chat-messages">
-                {% if user_input %}
-                    <div class="message user-message">
-                        <strong>You:</strong>
-                        <p>{{ user_input }}</p>
-                    </div>
-                {% endif %}
-                
-                {% if answer %}
-                    <div class="message bot-message">
-                        <strong>MindScape Bot:</strong>
-                        <p>{{ answer }}</p>
-                    </div>
-                {% endif %}
-                
-                {% if error %}
-                    <div class="message error-message">
-                        <strong>Error:</strong>
-                        <p>{{ error }}</p>
-                    </div>
-                {% endif %}
-            </div>
         </div>
     </div>
 </div>
@@ -221,4 +267,14 @@
   rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
 />
+
+<script>
+document.querySelector('.chat-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault(); // prevent newline
+        this.form.submit();
+    }
+});
+</script>
+
 {% endblock %}

@@ -315,13 +315,19 @@
         </button>
         <div class="collapse navbar-collapse" id="navbar">
           {% if session["user_id"] %}
-          <ul class="navbar-nav ms-auto mt-2">
+          <ul class="navbar-nav ms-auto mt-2 d-flex align-items-center">
+            <li class="nav-item me-2">
+              <a class="nav-link btn-login" href="/mental_health_chatbot">
+                <i class="bi bi-heart-pulse"></i> Healot
+              </a>
+            </li>
             <li class="nav-item">
               <a class="nav-link btn-logout" href="/logout">
                 <i class="bi bi-box-arrow-right"></i> Log Out
               </a>
             </li>
           </ul>
+
           {% else %}
           <ul class="navbar-nav ms-auto mt-2">
             <li class="nav-item">

@@ -4,7 +4,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import psycopg2
 from config import config_
 from collections import defaultdict
+from rag_bot import MentalHealthChatbot  
 
+chatbot_instance = MentalHealthChatbot()
+chatbot_instance.load_or_create_knowledge_base()
+chatbot_instance.initialize_chain()
 
 # Configure application
 app = Flask(__name__)
@@ -21,6 +25,22 @@ crsr = connection.cursor()
 @app.route('/')
 def home():
     return redirect(url_for('login'))
+
+@app.route('/mental_health_chatbot', methods=['GET', 'POST'])
+def mental_health_chatbot():
+    if request.method == 'POST':
+        user_input = request.form.get('user_input', '').strip()
+        if user_input:
+            try:
+                response = chatbot_instance.retrieval_chain.invoke({"input": user_input})
+                clean_answer = response['answer'].split('</think>')[-1].strip()
+                clean_answer = clean_answer.replace('<think>', '').strip()
+                return render_template("mental_chatbot.html", answer=clean_answer, user_input=user_input)
+            except Exception as e:
+                return render_template("mental_chatbot.html", error=str(e))
+        else:
+            flash('Please enter a message.', 'error')
+    return render_template("mental_chatbot.html")
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

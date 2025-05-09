@@ -11,41 +11,34 @@ import time
 
 class MentalHealthChatbot:
     def __init__(self):
-        # Initialize embedding model (using local Ollama)
-        self.embeddings = OllamaEmbeddings(model="qwen3:0.6b")
+        self.embeddings = OllamaEmbeddings(model="granite3-moe:latest")
         
-        # Initialize LLM (local)
-        self.llm = Ollama(model="qwen3:0.6b")
+        self.llm = Ollama(model="granite3-moe:latest")
         
-        # Initialize vector store
         self.vector_store = None
         self.retrieval_chain = None
-        self.faiss_index_path = "mental_health_faiss_index"  # Path to save/load FAISS index
+        self.faiss_index_path = "mental_health_faiss_index"  
         
     def load_or_create_knowledge_base(self):
         """Load documents and create vector store or load existing one"""
         print("\nLoading mental health resources...")
         
-        # Check if FAISS index exists
         if os.path.exists(self.faiss_index_path):
             print("Loading existing FAISS index...")
             self.vector_store = FAISS.load_local(
                 self.faiss_index_path, 
                 self.embeddings,
-                allow_dangerous_deserialization=True  # Required for FAISS
+                allow_dangerous_deserialization=True 
             )
             return
         
-        # Only load documents and create index if it doesn't exist
         print("Creating new FAISS index...")
         
-        # Example: Mix of web and local PDF sources
         web_loader = WebBaseLoader([
             "https://www.mind.org.uk/information-support/tips-for-everyday-living/student-life/about-student-mental-health/",
             "https://sprc.org/consequences-of-student-mental-health-issues/"
         ])
         
-        # Load local PDFs if available
         pdf_docs = []
         if os.path.exists("knowledge_base"):
             pdf_loader = DirectoryLoader("knowledge_base", glob="**/*.pdf", loader_cls=PyPDFLoader)
@@ -54,14 +47,12 @@ class MentalHealthChatbot:
         web_docs = web_loader.load()
         all_docs = web_docs + pdf_docs
         
-        # Split documents
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=1000,
             chunk_overlap=200
         )
-        splits = text_splitter.split_documents(all_docs[:50])  # Limit for local testing
+        splits = text_splitter.split_documents(all_docs[:50]) 
         
-        # Create and save vector store
         self.vector_store = FAISS.from_documents(splits, self.embeddings)
         self.vector_store.save_local(self.faiss_index_path)
         

@@ -10,10 +10,8 @@ chatbot_instance = MentalHealthChatbot()
 chatbot_instance.load_or_create_knowledge_base()
 chatbot_instance.initialize_chain()
 
-# Configure application
 app = Flask(__name__)
 
-# Configure session
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
@@ -26,21 +24,98 @@ crsr = connection.cursor()
 def home():
     return redirect(url_for('login'))
 
+import time
 @app.route('/mental_health_chatbot', methods=['GET', 'POST'])
 def mental_health_chatbot():
     if request.method == 'POST':
         user_input = request.form.get('user_input', '').strip()
+        action = request.form.get('action')
+        if action == 'clear':
+            try:
+                crsr.execute("DELETE FROM bot_answers WHERE user_id = %s", (session['user_id'],))
+                connection.commit()
+                return render_template("mental_chatbot.html", answer=[])
+            except Exception as e:
+                return render_template("mental_chatbot.html", error=str(e))
         if user_input:
             try:
+                crsr.execute("""
+                    CREATE TABLE IF NOT EXISTS bot_answers (
+                        user_id INT,
+                        user_input TEXT,
+                        answer TEXT,
+                        time_stamp TIMESTAMP,
+                        CONSTRAINT fk_users FOREIGN KEY (user_id) REFERENCES USERS(UserID)
+                    )
+                """)
+
+                print(f"User input: {user_input}")
+                start = time.time()
                 response = chatbot_instance.retrieval_chain.invoke({"input": user_input})
-                clean_answer = response['answer'].split('</think>')[-1].strip()
-                clean_answer = clean_answer.replace('<think>', '').strip()
-                return render_template("mental_chatbot.html", answer=clean_answer, user_input=user_input)
+                clean_answer = response['answer'].split('</think>')[-1].replace('<think>', '').strip()
+                end = time.time()
+                print(f"Total time: {end - start}")
+
+                crsr.execute("""
+                    INSERT INTO bot_answers (user_id, user_input, answer, time_stamp)
+                    VALUES (%s, %s, %s, NOW())
+                """, (session['user_id'], user_input, clean_answer))
+
+                connection.commit()
+
+                crsr.execute("""
+                    SELECT user_input, answer
+                    FROM bot_answers
+                    WHERE user_id = %s 
+                    ORDER BY time_stamp ASC
+                """, (session['user_id'],))
+
+                rows = crsr.fetchall()
+                answer = [
+                    {"user_input": row[0], "bot_answer": row[1]}
+                    for row in rows
+                ]
+
+                print(answer)
+
+                return render_template("mental_chatbot.html", answer=answer)
+
             except Exception as e:
                 return render_template("mental_chatbot.html", error=str(e))
         else:
             flash('Please enter a message.', 'error')
-    return render_template("mental_chatbot.html")
+            return render_template("mental_chatbot.html")
+
+    else:
+        try:
+            crsr.execute("""
+                SELECT EXISTS (
+                    SELECT FROM pg_tables 
+                    WHERE schemaname = 'public' AND tablename = 'bot_answers'
+                )
+            """)
+            table_exists = crsr.fetchone()[0]
+
+            if table_exists:
+                crsr.execute("""
+                    SELECT user_input, answer
+                    FROM bot_answers
+                    WHERE user_id = %s 
+                    ORDER BY time_stamp ASC
+                """, (session['user_id'],))
+                
+
+                rows = crsr.fetchall()
+                answer = [
+                    {"user_input": row[0], "bot_answer": row[1]}
+                    for row in rows
+                ]
+            else:
+                answer = None
+            return render_template("mental_chatbot.html", answer=answer)
+
+        except Exception as e:
+            return render_template("mental_chatbot.html", error=str(e))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -106,10 +181,8 @@ def register():
 def index():
     user_id = session.get("user_id")
     if user_id:
-        flash('Welcome back!', 'success')
-        return render_template('index.html')  # Render the main page for logged-in users
+        return render_template('index.html')  
     else:
-        flash('Please log in to access the homepage', 'info')
         return redirect(url_for('login'))
 
 @app.route('/communities')
@@ -130,9 +203,28 @@ def communities():
         {"UserID": row[0], "ModID": row[1], "BoardID": row[2]}
         for row in rowsx
     ]
+    crsr.execute("SELECT 1 FROM USER_MOD WHERE UserID = %s", (session['user_id'],))
+    result = crsr.fetchone()
+    
+    if result:
+        is_mod = result[0]  
+    else:
+        is_mod = False 
 
-    return render_template('communities.html', boards=boards, mods=mods)
+    return render_template('communities.html', boards=boards, mods=mods, is_mod=is_mod)
 
+
+@app.route('/delete_board/<int:board_id>', methods=['POST'])
+def delete_board(board_id):
+    crsr.execute("SELECT 1 FROM USER_MOD WHERE UserID = %s", (session['user_id'],))
+    result = crsr.fetchone()
+    print(f"ID: {session['user_id']}")
+    print(f"Result: {result}")
+    if result:
+        crsr.execute("DELETE FROM Board WHERE BoardID = %s", (board_id,))
+        connection.commit()  
+        print("Done")
+    return redirect(url_for('communities')) 
 
 
 @app.route('/board/<int:board_id>')
@@ -144,18 +236,14 @@ def board_detail_redirect(board_id):
 def board_comments(board_id):
     if request.method == "POST":
         comment_text = request.form['comment_text']
-        user_id = session.get('user_id')  # Adjust based on your session management
-        
-        # Get ParentCommentID from the form (if it's a reply)
+        user_id = session.get('user_id')  
         parent_comment_id = request.form.get('parent_comment_id')
         
-        # If it's a reply, ParentCommentID will be set, otherwise, it's a root comment (NULL)
         if parent_comment_id:
-            parent_comment_id = int(parent_comment_id)  # Ensure it's an integer
+            parent_comment_id = int(parent_comment_id)  
         else:
             parent_comment_id = None
 
-        # Insert the new comment (or reply) into the database
         crsr.execute("""
             INSERT INTO COMMENTS (BoardID, Text, Date, UserID, ParentCommentID)
             VALUES (%s, %s, NOW(), %s, %s)
@@ -165,7 +253,6 @@ def board_comments(board_id):
 
         return redirect(url_for('board_comments', board_id=board_id))
     
-    # Fetch all comments for the given board
     crsr.execute("""
         SELECT c.CommentID, c.BoardID, c.Text, c.Date, c.UserID, c.ParentCommentID, u.Username
         FROM COMMENTS c
@@ -176,7 +263,6 @@ def board_comments(board_id):
 
     rows = crsr.fetchall()
 
-    # Manual unpacking of tuples to dicts
     comments = []
     for row in rows:
         comment = {
@@ -190,7 +276,6 @@ def board_comments(board_id):
         }
         comments.append(comment)
 
-    # Build threaded comments
     comment_tree = defaultdict(list)
     for comment in comments:
         comment_tree[comment['ParentCommentID']].append(comment)

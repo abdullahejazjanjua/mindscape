@@ -275,6 +275,19 @@ document.querySelector('.chat-input').addEventListener('keydown', function(e) {
         this.form.submit();
     }
 });
+
+
+function scrollToBottom() {
+    const chatMessages = document.querySelector('.chat-messages');
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+document.addEventListener("DOMContentLoaded", scrollToBottom);
+
+document.querySelector('.chatbot-body form').addEventListener('submit', function() {
+    setTimeout(scrollToBottom, 100); 
+});
+
 </script>
 
 {% endblock %}

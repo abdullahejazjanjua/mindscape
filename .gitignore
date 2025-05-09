@@ -6,8 +6,6 @@ __pycache__/
 *.ini
 # C extensions
 *.so
-mental_health_faiss_index
-
 # Distribution / packaging
 .Python
 build/

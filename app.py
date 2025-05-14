@@ -1,6 +1,5 @@
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 from flask_session import Session
-from werkzeug.security import generate_password_hash, check_password_hash
 import psycopg2
 from config import config_
 from collections import defaultdict

@@ -11,9 +11,9 @@ import time
 
 class MentalHealthChatbot:
     def __init__(self):
-        self.embeddings = OllamaEmbeddings(model="granite3-moe:latest")
+        self.embeddings = OllamaEmbeddings(model="qwen3:0.6b")
         
-        self.llm = Ollama(model="granite3-moe:latest")
+        self.llm = Ollama(model="qwen3:0.6b")
         
         self.vector_store = None
         self.retrieval_chain = None
